@@ -1,0 +1,44 @@
+﻿<Window x:Class="iPlayground.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:iPlayground.WPF"
+        mc:Ignorable="d"
+        Title="iPlayground" Height="720" Width="1280">
+
+    <materialDesign:DialogHost Identifier="RootDialog">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Menu Panel -->
+            <Border Grid.Column="0" Background="#F0F0F0">
+                <StackPanel Margin="10">
+                    <Button Content="Aktivne Sesije" 
+                            Click="ActiveSessions_Click"
+                            Height="40" 
+                            Margin="0,5"/>
+
+                    <Button Content="Novo Dijete" 
+                            Click="NewChild_Click"
+                            Height="40" 
+                            Margin="0,5"/>
+
+                    <Button Content="Izvještaji" 
+                            Click="Reports_Click"
+                            Height="40" 
+                            Margin="0,5"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Main Content Area -->
+            <Border Grid.Column="1" Background="White">
+                <ContentControl x:Name="MainContent"/>
+            </Border>
+        </Grid>
+    </materialDesign:DialogHost>
+</Window>

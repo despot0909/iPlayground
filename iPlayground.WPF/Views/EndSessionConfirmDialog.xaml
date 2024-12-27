@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="iPlayground.WPF.Views.EndSessionConfirmDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Grid Width="400" Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Završetak sesije"
+                  Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                  Margin="0,0,0,16"/>
+
+        <!-- Content -->
+        <StackPanel Grid.Row="1" Margin="0,8">
+            <TextBlock Text="{Binding ChildName}" 
+                      TextWrapping="Wrap"
+                      Margin="0,4"/>
+            <TextBlock TextWrapping="Wrap"
+                      Margin="0,4">
+                <Run Text="Početak: "/>
+                <Run Text="{Binding StartTime, StringFormat=HH:mm}"/>
+            </TextBlock>
+            <TextBlock TextWrapping="Wrap"
+                      Margin="0,4">
+                <Run Text="Trajanje: "/>
+                <Run Text="{Binding Duration, StringFormat=\{0:hh\\:mm\}}"/>
+            </TextBlock>
+            <TextBlock Margin="0,8"
+                      FontWeight="Bold">
+                <Run Text="Za naplatu: "/>
+                <Run Text="{Binding Amount, StringFormat=N2}"/>
+                <Run Text=" KM"/>
+            </TextBlock>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Margin="0,16,0,0">
+            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    CommandParameter="False"
+                    Content="ODUSTANI"
+                    Margin="0,0,8,0"/>
+            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    CommandParameter="True"
+                    Content="ZAVRŠI"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
