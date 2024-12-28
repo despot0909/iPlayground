@@ -7,6 +7,9 @@ namespace iPlayground.Core.Interfaces.Services
 {
     public interface ISessionService
     {
+        Task PauseSessionAsync(int sessionId, int pauseMinutes);
+        Task ResumeSessionAsync(int sessionId);
+
         Task<Session> StartNewSessionAsync(Session session);
 
         Task<Session> StartSessionAsync(int childId);

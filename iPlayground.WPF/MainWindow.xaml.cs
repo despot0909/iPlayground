@@ -12,7 +12,7 @@ namespace iPlayground.WPF
     {
         private readonly ActiveSessionsView _activeSessionsView;
         private readonly InActiveSessionsView _inActiveSessionsView;
-
+ 
         private readonly ISessionService _sessionService;
         private readonly IParentService _parentService;
         private readonly IChildRepository _childRepository;
@@ -23,7 +23,9 @@ namespace iPlayground.WPF
             InActiveSessionsView inActiveSessionsView,
             ISessionService sessionService,
             IParentService parentService,
-            IChildRepository childRepository)
+            IChildRepository childRepository
+             )
+           
         {
             InitializeComponent();
             _activeSessionsView = activeSessionsView;
@@ -56,5 +58,7 @@ namespace iPlayground.WPF
         {
             MainContent.Content = _inActiveSessionsView;
         }
+
+        
     }
 }

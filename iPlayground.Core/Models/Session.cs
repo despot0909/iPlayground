@@ -48,8 +48,12 @@ namespace iPlayground.Core.Models
                 OnPropertyChanged(nameof(CompletedHours));
             }
         }
-
+        public bool IsStorno { get; set; }
+        public string? StornoReason { get; set; }
+        public DateTime? StornoTime { get; set; }
         public decimal TotalAmount { get; set; }
+        public decimal? LossAmount { get; set; }
+        public bool HasLoss { get; set; }
 
         public decimal TotalVaucer { get; set; }
         public bool IsFinished { get; set; }
@@ -57,7 +61,31 @@ namespace iPlayground.Core.Models
         public string InvoiceNumber { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public bool IsPaused { get; set; }
+        public DateTime? PauseStartTime { get; set; }
+        public bool IsPauseOverdue { get; set; }
+        public bool ShowEndButton { get; set; }
+        public bool CanPause { get; set; }
+        public string? PauseButtonText { get; set; }
+        public string? SessionStatus { get; set; }
 
+        public TimeSpan GetPauseDuration()
+        {
+            if (IsPaused && PauseStartTime.HasValue)
+            {
+                return DateTime.Now - PauseStartTime.Value;
+            }
+            return TimeSpan.Zero;
+        }
+
+        public bool IsOverPauseLimit(int maxPauseMinutes)
+        {
+            if (!IsPaused || !PauseStartTime.HasValue)
+                return false;
+
+            var pauseDuration = GetPauseDuration();
+            return pauseDuration.TotalMinutes > maxPauseMinutes;
+        }
         public Child Child { get; set; }
 
         public TimeSpan Duration => EndTime.HasValue

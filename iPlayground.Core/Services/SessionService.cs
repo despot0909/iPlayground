@@ -24,6 +24,21 @@ namespace iPlayground.Core.Services
 
  
         }
+        public async Task PauseSessionAsync(int sessionId, int pauseMinutes)
+        {
+            var session = await GetSessionByIdAsync(sessionId);
+            session.IsPaused = true;
+            session.PauseStartTime = DateTime.Now;
+            await UpdateSessionAsync(session);
+        }
+
+        public async Task ResumeSessionAsync(int sessionId)
+        {
+            var session = await GetSessionByIdAsync(sessionId);
+            session.IsPaused = false;
+            session.PauseStartTime = null;
+            await UpdateSessionAsync(session);
+        }
         public async Task<Session> StartNewSessionAsync(Session session)
         {
             await _sessionRepository.AddAsync(session);

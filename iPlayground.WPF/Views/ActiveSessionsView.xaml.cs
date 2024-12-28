@@ -70,14 +70,97 @@ private readonly IConfiguration _configuration;
 
             _refreshTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(5)
+                Interval = TimeSpan.FromSeconds(1)
             };
             _refreshTimer.Tick += (s, e) => LoadActiveSessions();
 
             Loaded += ActiveSessionsView_Loaded;
             StartAutoRefresh();
         }
+        private async void StornoSession_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.CommandParameter is Session session)
+            {
+                var dialog = new MaterialDesignThemes.Wpf.DialogHost();
+                var content = new StackPanel { Margin = new Thickness(16) };
+                decimal hr = _configuration.GetValue<decimal>("Settings:HourlyRate", 5.00M);
 
+
+                var title = new TextBlock
+                {
+                    Text = "Storno Sesije",
+                    Style = (Style)FindResource("MaterialDesignHeadline6TextBlock"),
+                    Margin = new Thickness(0, 0, 0, 16)
+                };
+                content.Children.Add(title);
+
+                var reasonTextBox = new TextBox
+                {
+                    Style = (Style)FindResource("MaterialDesignOutlinedTextBox"),
+                    Margin = new Thickness(0, 0, 0, 16),
+                    MinWidth = 300,
+                    MinHeight = 100,
+                    TextWrapping = TextWrapping.Wrap,
+                    AcceptsReturn = true,
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                    
+                };
+                content.Children.Add(reasonTextBox);
+
+                var buttonsPanel = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right
+                };
+
+                var confirmButton = new Button
+                {
+                    Content = "Potvrdi",
+                    Style = (Style)FindResource("MaterialDesignFlatButton"),
+                    Command = MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand,
+                    CommandParameter = true,
+                    Margin = new Thickness(0, 0, 8, 0)
+                };
+
+                var cancelButton = new Button
+                {
+                    Content = "Odustani",
+                    Style = (Style)FindResource("MaterialDesignFlatButton"),
+                    Command = MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand,
+                    CommandParameter = false
+                };
+
+                buttonsPanel.Children.Add(confirmButton);
+                buttonsPanel.Children.Add(cancelButton);
+                content.Children.Add(buttonsPanel);
+
+                var result = await MaterialDesignThemes.Wpf.DialogHost.Show(content, "RootDialog");
+
+                if (result is bool boolResult && boolResult && !string.IsNullOrWhiteSpace(reasonTextBox.Text))
+                {
+                    try
+                    {
+                        session.IsStorno = true;
+                        session.StornoReason = reasonTextBox.Text;
+                        session.StornoTime = DateTime.Now;
+                        session.SessionStatus = "STORNO";
+
+                        await _sessionService.UpdateSessionAsync(session);
+                        await _sessionService.EndSessionAsync(session.Id, hr);
+
+                        LoadActiveSessions();
+
+                        MessageBox.Show("Sesija je uspješno stornirana!", "Uspjeh",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Greška pri storniranju: {ex.Message}", "Greška",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
 
         private void StartAutoRefresh()
         {
@@ -132,6 +215,33 @@ private readonly IConfiguration _configuration;
                 await MaterialDesignThemes.Wpf.DialogHost.Show(content, "RootDialog");
             }
         }
+        private async void PauseSession_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.CommandParameter is Session session)
+            {
+                try
+                {
+                    if (session.IsPaused)
+                    {
+                        // Resume session
+                        await _sessionService.ResumeSessionAsync(session.Id);
+                    }
+                    else
+                    {
+                        // Pause session
+                        int pauseMinutes = _configuration.GetValue<int>("Settings:MaxPauseMinutes", 15);
+                        await _sessionService.PauseSessionAsync(session.Id, pauseMinutes);
+                    }
+                    LoadActiveSessions();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Greška: {ex.Message}", "Greška",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         public async void LoadActiveSessions()
         {
             try
@@ -142,7 +252,27 @@ private readonly IConfiguration _configuration;
                     session.OnPropertyChanged(nameof(session.Duration));
                     session.OnPropertyChanged(nameof(session.CompletedHours));
                     decimal hr = _configuration.GetValue<decimal>("Settings:HourlyRate", 5.00M);
-                    session.TotalAmount = await _sessionService.CalculateSessionAmountAsync(session.Id,hr);
+                    session.TotalAmount = await _sessionService.CalculateSessionAmountAsync(session.Id, hr);
+
+                    // Check pause status
+                    if (session.IsPaused && session.PauseStartTime.HasValue)
+                    {
+                        var pauseLimit = _configuration.GetValue<int>("Settings:MaxPauseMinutes", 15);
+                        var pauseDuration = DateTime.Now - session.PauseStartTime.Value;
+                        session.IsPauseOverdue = pauseDuration.TotalMinutes > pauseLimit;
+                        session.ShowEndButton = session.IsPauseOverdue;
+                        session.CanPause = !session.IsPauseOverdue;
+                        session.PauseButtonText = "Nastavi";
+                        session.SessionStatus = session.IsPauseOverdue ? "Pauza (Prekoračeno)" : "Pauza";
+                    }
+                    else
+                    {
+                        session.IsPauseOverdue = false;
+                        session.ShowEndButton = false;
+                        session.CanPause = true;
+                        session.PauseButtonText = "Pauza";
+                        session.SessionStatus = "Aktivno";
+                    }
                 }
                 SessionsGrid.ItemsSource = sessions;
             }
@@ -175,8 +305,9 @@ private readonly IConfiguration _configuration;
                             IsValid = true
                         };
 
-                        await _voucherRepository.AddAsync(voucher);
-                        await _voucherRepository.SaveChangesAsync();
+                        session.TotalVaucer = _voucherService.HourlyDiscountAmount;
+                     //   await _voucherRepository.AddAsync(voucher);
+                      //  await _voucherRepository.SaveChangesAsync();
 
                         // Osvježi prikaz
                     }

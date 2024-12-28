@@ -68,6 +68,22 @@ namespace iPlayground.Data.Context
                 .WithMany()
                 .HasForeignKey(s => s.ChildId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Session>(entity =>
+            {
+                entity.Property(e => e.IsPaused)
+               .HasDefaultValue(false);
+
+                entity.Property(e => e.PauseStartTime)
+                    .IsRequired(false);
+
+                entity.Property(e => e.LossAmount)
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired(false);
+
+                entity.Property(e => e.SessionStatus)
+                    .HasMaxLength(50)
+                    .IsRequired(false);
+            });
 
             // Configure decimal properties
             modelBuilder.Entity<Session>()

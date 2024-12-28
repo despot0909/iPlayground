@@ -19,7 +19,7 @@ namespace iPlayground.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Phone = table.Column<string>(type: "TEXT", nullable: false),
-                    ContactInfo = table.Column<string>(type: "TEXT", nullable: true),
+                    ContactInfo = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
@@ -61,6 +61,27 @@ namespace iPlayground.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SyncLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VoucherValidations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FiscalNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    Amount = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    JIB = table.Column<string>(type: "TEXT", nullable: false),
+                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "TEXT", nullable: false),
+                    ValidationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    QRCode = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VoucherValidations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -122,12 +143,21 @@ namespace iPlayground.Data.Migrations
                     StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EndTime = table.Column<DateTime>(type: "TEXT", nullable: true),
                     TotalAmount = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    LossAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    HasLoss = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TotalVaucer = table.Column<decimal>(type: "TEXT", nullable: false),
                     IsFinished = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TotalVaucer = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: true),
                     IsSynced = table.Column<bool>(type: "INTEGER", nullable: false),
                     InvoiceNumber = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsPaused = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
+                    PauseStartTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsPauseOverdue = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ShowEndButton = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CanPause = table.Column<bool>(type: "INTEGER", nullable: false),
+                    PauseButtonText = table.Column<string>(type: "TEXT", nullable: false),
+                    SessionStatus = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -138,7 +168,34 @@ namespace iPlayground.Data.Migrations
                         principalTable: "Children",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                }); ;
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SessionVouchers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SessionId = table.Column<int>(type: "INTEGER", nullable: false),
+                    FiscalNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    QRCode = table.Column<string>(type: "TEXT", nullable: false),
+                    OriginalAmount = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    DiscountAmount = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    ScanTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SessionVouchers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SessionVouchers_Sessions_SessionId",
+                        column: x => x.SessionId,
+                        principalTable: "Sessions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Vouchers",
@@ -146,11 +203,17 @@ namespace iPlayground.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FiscalReceiptNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    FiscalNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    FiscalQRCode = table.Column<string>(type: "TEXT", nullable: false),
                     OriginalAmount = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
                     IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
                     UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    SessionId = table.Column<int>(type: "INTEGER", nullable: true),
+                    SessionId = table.Column<int>(type: "INTEGER", nullable: false),
+                    JIB = table.Column<string>(type: "TEXT", nullable: false),
+                    IssueDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ValidationDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ValidationMessage = table.Column<string>(type: "TEXT", nullable: false),
+                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
@@ -161,7 +224,8 @@ namespace iPlayground.Data.Migrations
                         name: "FK_Vouchers_Sessions_SessionId",
                         column: x => x.SessionId,
                         principalTable: "Sessions",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -190,9 +254,48 @@ namespace iPlayground.Data.Migrations
                 column: "StartTime");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SessionVouchers_FiscalNumber",
+                table: "SessionVouchers",
+                column: "FiscalNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SessionVouchers_QRCode",
+                table: "SessionVouchers",
+                column: "QRCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SessionVouchers_SessionId",
+                table: "SessionVouchers",
+                column: "SessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vouchers_FiscalNumber",
+                table: "Vouchers",
+                column: "FiscalNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vouchers_FiscalQRCode",
+                table: "Vouchers",
+                column: "FiscalQRCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Vouchers_SessionId",
                 table: "Vouchers",
                 column: "SessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VoucherValidations_FiscalNumber",
+                table: "VoucherValidations",
+                column: "FiscalNumber");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VoucherValidations_QRCode",
+                table: "VoucherValidations",
+                column: "QRCode");
         }
 
         /// <inheritdoc />
@@ -202,6 +305,9 @@ namespace iPlayground.Data.Migrations
                 name: "MonthlyPasses");
 
             migrationBuilder.DropTable(
+                name: "SessionVouchers");
+
+            migrationBuilder.DropTable(
                 name: "Settings");
 
             migrationBuilder.DropTable(
@@ -209,6 +315,9 @@ namespace iPlayground.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Vouchers");
+
+            migrationBuilder.DropTable(
+                name: "VoucherValidations");
 
             migrationBuilder.DropTable(
                 name: "Sessions");

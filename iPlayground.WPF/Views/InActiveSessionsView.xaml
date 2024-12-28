@@ -3,15 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
     <Grid Margin="20">
-        <!-- Header -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header with Title and New Child Button -->
+        <!-- Header with Title -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -19,20 +18,13 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Text="Neaktivne Sesije" 
-                   FontSize="24" 
-                   VerticalAlignment="Center"/>
+                      FontSize="24" 
+                      VerticalAlignment="Center"/>
         </Grid>
 
         <!-- Filter Controls -->
         <Grid Grid.Row="1" Margin="0,10,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto" MinWidth="112"/>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,10,0,10" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="Od:" VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <DatePicker x:Name="DatePickerStart" Margin="0,0,20,0"/>
 
@@ -40,71 +32,129 @@
                 <DatePicker x:Name="DatePickerEnd" Margin="0,0,20,0"/>
 
                 <Button Content="Primijeni Filter"
-            Click="ApplyDateFilter_Click"
-            Margin="10,0,0,0"
-            Width="120"
-            Background="#FFE86D44"
-            Foreground="White"/>
+                        Click="ApplyDateFilter_Click"
+                        Margin="10,0,0,0"
+                        Width="120"
+                        Background="#FFE86D44"
+                        Foreground="White"/>
             </StackPanel>
         </Grid>
 
-        <!-- Sessions Grid -->
-        <DataGrid Grid.Row="2"
-              x:Name="SessionsGrid"
-              AutoGenerateColumns="False"
-              IsReadOnly="True"
-              Background="White"
-              BorderThickness="1"
-              BorderBrush="#FFE86D44"
-              RowHeight="50"
-              HeadersVisibility="Column"
-              GridLinesVisibility="None"
-              materialDesign:DataGridAssist.CellPadding="5"
-              materialDesign:DataGridAssist.ColumnHeaderPadding="3">
-            <DataGrid.Resources>
-                <Style TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Background" Value="#F5F5F5"/>
-                    <Setter Property="Foreground" Value="#757575"/>
-                    <Setter Property="FontWeight" Value="SemiBold"/>
-                    <Setter Property="Padding" Value="10"/>
-                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                    <Setter Property="BorderBrush" Value="#FFE86D44"/>
-                </Style>
-            </DataGrid.Resources>
+        <!-- ScrollViewer for DataGrid -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <DataGrid x:Name="SessionsGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      Background="White"
+                      BorderThickness="1"
+                      BorderBrush="#FFE86D44"
+                      RowHeight="50"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="None"
+                      materialDesign:DataGridAssist.CellPadding="5"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="3">
+                <DataGrid.Resources>
+                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Background" Value="#F5F5F5"/>
+                        <Setter Property="Foreground" Value="#757575"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="10"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="#FFE86D44"/>
+                    </Style>
+                </DataGrid.Resources>
 
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Ime" 
-                                Binding="{Binding Child.FirstName}"
-                                Width="*"/>
-                <DataGridTextColumn Header="Prezime" 
-                                Binding="{Binding Child.LastName}"
-                                Width="*"/>
-                <DataGridTextColumn Header="Roditelj" 
-                                Binding="{Binding Child.Parent.Name}"
-                                Width="*"/>
-                <DataGridTextColumn Header="Telefon" 
-                                Binding="{Binding Child.Parent.Phone}"
-                                Width="*"/>
-                <DataGridTextColumn Header="Početak" 
-                                Binding="{Binding StartTime, StringFormat='HH:mm'}"
-                                Width="*"/>
-                <DataGridTextColumn Header="Kraj" 
-                                Binding="{Binding EndTime, StringFormat='HH:mm'}"
-                                Width="*"/>
-                <DataGridTextColumn Header="Trajanje" 
-                                Binding="{Binding FormattedDuration}"
-                                Width="*"/>
-                <DataGridTextColumn Header="Cijena" 
-                                Binding="{Binding TotalAmount, StringFormat='{}{0:N2} KM'}"
-                                Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ime" 
+                                      Binding="{Binding Child.FirstName}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Prezime" 
+                                      Binding="{Binding Child.LastName}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Roditelj" 
+                                      Binding="{Binding Child.Parent.Name}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Telefon" 
+                                      Binding="{Binding Child.Parent.Phone}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Početak" 
+                                      Binding="{Binding StartTime, StringFormat='dd.MM.yyyy HH:mm'}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Kraj" 
+                                      Binding="{Binding EndTime, StringFormat='dd.MM.yyyy HH:mm'}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Trajanje" 
+                                      Binding="{Binding FormattedDuration}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Status" 
+                    Width="*">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{}{0}">
+                                <Binding Path="SessionStatus"/>
+                                 
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStorno}" Value="True">
+                                        <Setter Property="Background" Value="#ffcdd2"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
 
-        <!-- Totals -->
-        <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="0,10,0,0">
-            <TextBlock x:Name="TotalAmountTextBlock" FontSize="18" Margin="0,0,20,0"/>
-            <TextBlock x:Name="TotalVoucherTextBlock" FontSize="18"/>
+                    <DataGridTemplateColumn Header="Storno Info" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Visibility="{Binding IsStorno, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <TextBlock Text="{Binding StornoReason}" 
+                          TextWrapping="Wrap" 
+                          Margin="0,2"/>
+                                    <TextBlock Text="{Binding StornoTime, StringFormat='dd.MM.yyyy HH:mm'}" 
+                          FontStyle="Italic" 
+                          FontSize="11"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="Vaucer" 
+                                      Binding="{Binding TotalVaucer, StringFormat='{}{0:N2} KM'}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Cijena" 
+                                      Binding="{Binding TotalAmount, StringFormat='{}{0:N2} KM'}"
+                                      Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
+
+        <!-- Summary Panel -->
+        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="5">
+                    <TextBlock Text="Ukupan Promet" FontWeight="Bold"/>
+                    <TextBlock x:Name="TotalAmountTextBlock" FontSize="16"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="5">
+                    <TextBlock Text="Ukupno Vaučeri" FontWeight="Bold"/>
+                    <TextBlock x:Name="TotalVoucherTextBlock" FontSize="16"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="5">
+                    <TextBlock Text="Stornirane Sesije" FontWeight="Bold"/>
+                    <TextBlock x:Name="StornoTotalTextBlock" FontSize="16"/>
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </Grid>
-
 </UserControl>

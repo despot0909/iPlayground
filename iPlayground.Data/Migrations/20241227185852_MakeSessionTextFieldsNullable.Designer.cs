@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using iPlayground.Data.Context;
 
@@ -10,9 +11,11 @@ using iPlayground.Data.Context;
 namespace iPlayground.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241227185852_MakeSessionTextFieldsNullable")]
+    partial class MakeSessionTextFieldsNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.20");
@@ -153,9 +156,6 @@ namespace iPlayground.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(false);
 
-                    b.Property<bool>("IsStorno")
-                        .HasColumnType("INTEGER");
-
                     b.Property<bool>("IsSynced")
                         .HasColumnType("INTEGER");
 
@@ -176,12 +176,6 @@ namespace iPlayground.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("StornoReason")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("StornoTime")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalAmount")

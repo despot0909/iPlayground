@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
     <Grid Margin="20">
-        <!-- Header -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -32,87 +31,106 @@
                     Margin="0,0,0,20"/>
         </Grid>
 
-        <!-- Sessions Grid -->
-        <DataGrid Grid.Row="1"
-                  x:Name="SessionsGrid"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  Background="White"
-                  BorderThickness="1"
-                  BorderBrush="#FFE86D44"
-                  RowHeight="50"
-                  HeadersVisibility="Column"
-                  GridLinesVisibility="None"
-                  materialDesign:DataGridAssist.CellPadding="5"
-                  materialDesign:DataGridAssist.ColumnHeaderPadding="3">
-            <DataGrid.Resources>
-                <Style TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Background" Value="#F5F5F5"/>
-                    
-                    <Setter Property="Foreground" Value="#757575"/>
-                    <Setter Property="FontWeight" Value="SemiBold"/>
-                    <Setter Property="Padding" Value="10"/>
-                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                    <Setter Property="BorderBrush" Value="#FFE86D44"/>
-                </Style>
-            </DataGrid.Resources>
+        <!-- ScrollViewer for DataGrid -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <DataGrid x:Name="SessionsGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      Background="White"
+                      BorderThickness="1"
+                      BorderBrush="#FFE86D44"
+                      RowHeight="50"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="None"
+                      materialDesign:DataGridAssist.CellPadding="5"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="3">
+                <DataGrid.Resources>
+                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Background" Value="#F5F5F5"/>
+                        <Setter Property="Foreground" Value="#757575"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="10"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="#FFE86D44"/>
+                    </Style>
+                    <!-- Row Style for Overdue Paused Sessions -->
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPauseOverdue}" Value="True">
+                                <Setter Property="Background" Value="#FFEBEE"/>
+                                <Setter Property="Foreground" Value="#B71C1C"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
 
-            <DataGrid.Columns >
-                <DataGridTextColumn Header="Ime" 
-                                  Binding="{Binding Child.FirstName}"
-                                  Width="*"/>
-                <DataGridTextColumn Header="Prezime" 
-                                  Binding="{Binding Child.LastName}"
-                                  Width="*"/>
-                <DataGridTextColumn Header="Roditelj" 
-                                  Binding="{Binding Child.Parent.Name}"
-                                  Width="*"/>
-                <DataGridTextColumn Header="Telefon" 
-                                  Binding="{Binding Child.Parent.Phone}"
-                                  Width="*"/>
-                <DataGridTextColumn Header="Početak" 
-                                  Binding="{Binding StartTime, StringFormat='HH:mm'}"
-                                  Width="*"/>
-                <DataGridTextColumn Header="Trajanje" 
-                                  Binding="{Binding FormattedDuration}"
-                                  Width="*"/>
-                <DataGridTextColumn Header="Vaučeri" 
-                    Width="Auto">
-                    <DataGridTextColumn.Binding>
-                        <MultiBinding StringFormat="{}{0:N2} KM ({1})">
-                            <Binding Path="VouchersDiscountAmount"/>
-                            <Binding Path="Vouchers.Count"/>
-                        </MultiBinding>
-                    </DataGridTextColumn.Binding>
-                </DataGridTextColumn>
-
-                <DataGridTextColumn Header="Za naplatu" 
-                    Binding="{Binding FinalAmount, StringFormat={}{0:N2} KM}"
-                    FontWeight="Bold"/>
-                <DataGridTextColumn Header="Cijena" 
-                                  Binding="{Binding TotalAmount, StringFormat='{}{0:N2} KM'}"
-                                  Width="*"/>
-                <DataGridTemplateColumn Width="Auto" Header="Akcije">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Content="Završi" 
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ime" 
+                                   
+                                      Binding="{Binding Child.FirstName}"
+                                       
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Prezime" 
+                                      Binding="{Binding Child.LastName}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Roditelj" 
+                                      Binding="{Binding Child.Parent.Name}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Telefon" 
+                                      Binding="{Binding Child.Parent.Phone}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Početak" 
+                                      Binding="{Binding StartTime, StringFormat='HH:mm'}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Status" 
+                                      Binding="{Binding SessionStatus}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Trajanje" 
+                                      Binding="{Binding FormattedDuration}"
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Vaučeri">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{}{0:N2} KM ({1})">
+                                <Binding Path="TotalVaucer"/>
+                                <Binding Path="Vouchers.Count"/>
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Za naplatu" 
+                                      Binding="{Binding FinalAmount, StringFormat={}{0:N2} KM}"
+                                      FontWeight="Bold"/>
+                    <DataGridTextColumn Header="Cijena" 
+                                      Binding="{Binding TotalAmount, StringFormat='{}{0:N2} KM'}"
+                                      Width="*"/>
+                    <!-- Update the Actions column in DataGrid.Columns -->
+                    <DataGridTemplateColumn Width="Auto" Header="Akcije">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Završi" 
                         Click="EndSession_Click"
                         CommandParameter="{Binding}"
                         Style="{StaticResource MaterialDesignRaisedButton}"
                         Background="#673AB7"
                         Margin="5"/>
-                                <Button Content="Vaučer"
+                                   
+                                    <Button Content="Vaučer"
                         Click="ScanVoucher_Click"
                         CommandParameter="{Binding}"
                         Style="{StaticResource MaterialDesignOutlinedButton}"
                         Margin="5"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-            </DataGrid.Columns>
-        </DataGrid>
+                                    <Button Content="Storno"
+                        Click="StornoSession_Click"
+                        CommandParameter="{Binding}"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Background="#ffcdd2"
+                        Margin="5"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
     </Grid>
 </UserControl>
